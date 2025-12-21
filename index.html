@@ -90,7 +90,7 @@
 
         /* MAIN CARD */
         .card {
-            width: 90%; max-width: 420px; background: var(--glass);
+            width: 90%; max-width: 460px; background: var(--glass);  /* Update - changed max-width from 420px => 460px for better handling of the AUDIO PLAYER */
             backdrop-filter: blur(25px); border: 1px solid var(--glass-border);
             border-radius: 32px; padding: 2.5rem 2rem; text-align: center;
             opacity: 0; transform: translateY(60px);
@@ -108,6 +108,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
 
         /* AUDIO PLAYER STYLES */
+        /* Note - Need to refactor player. It got squeezed at mobile / low sized devices */
         .audio-player {
             margin-top: 25px;
             background: rgba(255,255,255,0.03);
@@ -121,7 +122,7 @@
         .play-btn {
             background: var(--accent);
             border: none;
-            width: 35px; height: 35px;
+            width: 35px; height: 35px; 
             border-radius: 50%;
             cursor: pointer;
             display: flex; justify-content: center; align-items: center;
