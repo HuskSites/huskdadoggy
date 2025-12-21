@@ -1,290 +1,219 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Husk | Portfolio 2025</title>
-
+    <title>Pro Light System - huskdadoggy0</title>
     <style>
-        :root {
-            --bg: #000;
-            --glass: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --text: #ffffff;
-            --accent: #bb86fc;
-            --sidebar-bg: rgba(10, 10, 10, 0.98);
-        }
-
-        [data-theme="light"] {
-            --bg: #f5f7fa;
-            --glass: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --text: #1a1a1a;
-            --accent: #6200ee;
-            --sidebar-bg: rgba(255, 255, 255, 0.98);
-        }
-
-        * { box-sizing: border-box; }
-
         body {
-            margin: 0; min-height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            background-color: var(--bg);
-            background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                              radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            font-family: 'Inter', sans-serif;
-            color: var(--text); overflow-x: hidden;
+            margin: 0;
+            background-color: #000;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* LOADING SCREEN */
-        #loading-screen {
-            position: fixed; inset: 0; background: #050505;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; transition: opacity 0.8s ease, visibility 0.8s;
-            text-align: center;
-        }
-        .loader-circle {
-            width: 40px; height: 40px; border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid var(--accent); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 25px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-title { letter-spacing: 3px; font-size: 0.75rem; font-weight: 700; color: white; text-transform: uppercase; margin: 0; }
-        .loading-credits { font-size: 0.8rem; color: var(--accent); margin-top: 8px; opacity: 0.8; }
-
-        /* NOTIFICATION */
-        #husksites-notif {
-            position: fixed; top: 20px; background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); color: var(--text);
-            padding: 12px 24px; border-radius: 50px; font-weight: 600;
-            z-index: 10000; transform: translateY(-100px); opacity: 0;
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        #husksites-notif.show { transform: translateY(0); opacity: 1; }
-
-        /* MENU ICON */
-        .menu-icon {
-            position: fixed; top: 25px; right: 25px; z-index: 1001;
-            background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 12px 15px; border-radius: 12px; backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; gap: 4px; cursor: pointer;
-        }
-        .menu-icon span { width: 5px; height: 5px; background: var(--text); border-radius: 50%; }
-
-        /* SIDEBAR */
-        .sidebar {
-            position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--sidebar-bg); z-index: 1000; transition: 0.5s;
-            padding: 100px 25px; border-left: 1px solid var(--glass-border);
-            display: flex; flex-direction: column;
-        }
-        .sidebar.active { right: 0; }
-        .sidebar-btn {
-            background: var(--glass); color: var(--text); border: 1px solid var(--glass-border);
-            padding: 15px; margin-bottom: 10px; border-radius: 14px; text-align: left;
-            font-weight: 600; transition: 0.3s; width: 100%; cursor: pointer;
-        }
-        .sidebar-btn:hover { background: var(--accent); color: white; }
-
-        /* MAIN CARD */
-        .card {
-            width: 90%; max-width: 460px; background: var(--glass);  /* Update - changed max-width from 420px => 460px for better handling of the AUDIO PLAYER */
-            backdrop-filter: blur(25px); border: 1px solid var(--glass-border);
-            border-radius: 32px; padding: 2.5rem 2rem; text-align: center;
-            opacity: 0; transform: translateY(60px);
-            transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .card.visible { opacity: 1; transform: translateY(0); }
-
-        .profile-img { width: 90px; height: 90px; border-radius: 50%; border: 2px solid var(--accent); margin-bottom: 1rem; object-fit: cover; }
-        .tabs { display: flex; gap: 10px; justify-content: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 12px; }
-        .tab-btn { background: none; border: none; color: var(--text); opacity: 0.4; font-weight: 600; font-size: 0.85rem; transition: 0.3s; cursor: pointer; }
-        .tab-btn.active { opacity: 1; color: var(--accent); }
-
-        .content-section { display: none; animation: fadeIn 0.5s ease; }
-        .content-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-
-        /* AUDIO PLAYER STYLES */
-        /* Note - Need to refactor player. It got squeezed at mobile / low sized devices */
-        .audio-player {
-            margin-top: 25px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 12px 20px;
+        /* Warning Overlay */
+        #warning-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            color: white;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            z-index: 999;
+            text-align: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out, visibility 0.5s;
         }
-        .play-btn {
-            background: var(--accent);
+        #warning-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; /* Prevents clicking invisible div */
+        }
+        .warning-box {
+            max-width: 500px;
+            border: 2px solid #ff0000;
+            padding: 30px;
+            border-radius: 15px;
+            background: #111;
+        }
+        .warning-box h1 { color: #ff0000; margin-top: 0; }
+        .proceed-btn {
+            background: #ff0000;
+            color: white;
             border: none;
-            width: 35px; height: 35px; 
-            border-radius: 50%;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 5px;
             cursor: pointer;
-            display: flex; justify-content: center; align-items: center;
-            color: black; font-size: 14px; transition: 0.3s;
+            margin-top: 20px;
         }
-        .play-btn:hover { transform: scale(1.1); }
-        .volume-slider {
-            flex-grow: 1;
-            height: 4px;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
-        .song-info { font-size: 0.7rem; opacity: 0.6; text-align: left; }
 
-        /* GALLERY & TEXT */
-        .about-text { text-align: left; line-height: 1.6; font-size: 0.9rem; opacity: 0.8; word-wrap: break-word; overflow-wrap: break-word; margin: 0; }
-        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .gallery-item { aspect-ratio: 1; background: rgba(255,255,255,0.05); border-radius: 15px; overflow: hidden; border: 1px solid var(--glass-border); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        .link-stack { display: flex; flex-direction: column; gap: 10px; }
-        .social-link { background: var(--glass); color: var(--text); text-decoration: none; padding: 14px; border-radius: 14px; border: 1px solid var(--glass-border); transition: 0.3s; font-size: 0.9rem; font-weight: 500; cursor: pointer; }
-        .social-link:hover { background: var(--accent); color: black; transform: translateY(-3px); }
+        /* Credit Banner */
+        #credit-bar {
+            background: #111;
+            color: #666;
+            text-align: center;
+            padding: 8px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #222;
+        }
+        #credit-bar span { color: #0066ff; font-weight: bold; }
+
+        /* Light Bar Container and Controls (Same as before) */
+        #light-bar { flex-grow: 1; display: flex; align-items: stretch; padding: 20px; gap: 15px; }
+        .light-panel { flex: 1; border-radius: 12px; transition: background 0.03s ease-in-out, box-shadow 0.03s; }
+        #ui { background: #151515; padding: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; border-top: 4px solid #252525; }
+        .group { display: flex; flex-direction: column; gap: 8px; }
+        label { color: #666; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        select, input, button { background: #222; color: white; border: 1px solid #333; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; }
+        #powerBtn { font-weight: bold; background: #330000; color: #ff4444; cursor: pointer; border: 1px solid #550000; }
+        #powerBtn.active { background: #003300; color: #44ff44; border: 1px solid #005500; }
+        .red-glow { background: #ff0000; box-shadow: 0 0 120px #ff0000; }
+        .blue-glow { background: #0055ff; box-shadow: 0 0 120px #0055ff; }
+        .off { background: #0a0a0a; box-shadow: none; }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen">
-        <div class="loader-circle"></div>
-        <p class="loading-title">Loading Experience</p>
-        <div class="loading-credits">Created by Husk & Hosted by HacerHosters</div>
-    </div>
-
-    <div id="husksites-notif">Built by Huskdadoggy0, Hosting: HacerHosters</div>
-
-    <div class="menu-icon" onclick="toggleMenu()">
-        <span></span><span></span><span></span>
-    </div>
-
-    <div class="sidebar" id="sidebar">
-        <button class="sidebar-btn" onclick="toggleTheme()">🌓 Switch Theme</button>
-        <button class="sidebar-btn" onclick="openTabDirect('credits')">📜 Site Credits</button>
-        <button class="sidebar-btn" onclick="toggleMenu()">🏠 Close Menu</button>
-        <div style="margin-top: auto; font-size: 0.75rem; opacity: 0.5;">
-            © 2025 HuskSites Engine<br>
-            Server: HacerHosters Secure
+    <!-- Seizure Warning Modal -->
+    <div id="warning-overlay">
+        <div class="warning-box">
+            <h1>⚠️ SEIZURE WARNING</h1>
+            <p>This application contains <b>bright, high-intensity flashing lights</b> and rapid strobing effects that may trigger photosensitive epilepsy or discomfort.</p>
+            <p>By clicking proceed, you acknowledge this risk.</p>
+            <button class="proceed-btn" onclick="dismissWarning()">I UNDERSTAND & PROCEED</button>
         </div>
     </div>
 
-    <div class="card" id="mainCard">
-        <img src="/gifhusk1.gif" alt="Husks Profile" class="profile-img">
-        <h1 style="margin:0">Husk</h1>
-        <p style="opacity:0.6; font-size:0.85rem; margin: 5px 0 20px 0;">Digital Creator & Designer of F2U Bases.</p>
+    <div id="credit-bar">
+        Emergency Signal System — Made by <span>huskdadoggy0</span> on Discord
+    </div>
 
-        <div class="tabs">
-            <button class="tab-btn active" onclick="openTab(event, 'links')">Links</button>
-            <button class="tab-btn" onclick="openTab(event, 'gallery')">F2U Gallery</button>
-            <button class="tab-btn" onclick="openTab(event, 'about')">About</button>
+    <div id="light-bar">
+        <div id="L" class="light-panel off"></div>
+        <div id="R" class="light-panel off"></div>
+    </div>
+
+    <div id="ui">
+        <div class="group">
+            <label>Light Sequence</label>
+            <select id="mode">
+                <option value="oneforone">1 for 1 (Alternating)</option>
+                <option value="twofortwo">2 for 2 (Double Tap)</option>
+                <option value="wigwag">Side to Side (Slow)</option>
+                <option value="sync">Sync Flash (Both)</option>
+            </select>
         </div>
 
-        <div id="links" class="content-section active">
-            <div class="link-stack">
-                <a href="https://discord.gg/rTRzrZYxzE" target="_blank" class="social-link">Zens Discord Community</a>
-                <a href="https://www.youtube.com/@AdalFainted" target="_blank" class="social-link">Husks YouTube Channel</a>  
-                <a href="https://discord.gg/9UWd3773Rt" target="_blank" class="social-link">MY Discord Server</a>
-            </div>
+        <div class="group">
+            <label>Speed (ms)</label>
+            <input type="number" id="speed" value="70" min="30" max="500">
         </div>
 
-        <div id="gallery" class="content-section">
-            <div class="gallery-grid">
-                <div class="gallery-item"><img src="/f2uhusk1.webp"></div>
-                <div class="gallery-item"><img src="/f2ubyhusk2.jpg"></div>
-                <div class="gallery-item"><img src="/f2ubyhusk.png"></div>
-                <div class="gallery-item"><img src="/husk1.png"></div>
-            </div>
-        </div>
-
-        <div id="about" class="content-section">
-            <p class="about-text">
-                in progress!<br><br>
-                <strong>— huskdadoggy0</strong>
-            </p>
-        </div>
-
-        <div id="credits" class="content-section">
-            <p class="about-text">
-                <strong>Project:</strong> Husk Portfolio v2.5<br>
-                <strong>Created by:</strong> Huskdadoggy0<br>
-                <strong>Hosting:</strong> HacerHosters<br>
-                <strong>Engine:</strong> HuskSites 2025
-            </p>
-        </div>
-
-        <!-- AUDIO PLAYER -->
-        <div class="audio-player">
-            <audio id="myAudio" src="/audio.mp3"></audio>
-            <button class="play-btn" id="playBtn">▶</button>
-            <div class="song-info">
-                <strong>My Radio</strong><br>
-                Playing From "Song Favorites"
-            </div>
-            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+        <div class="group">
+            <label>Master Power</label>
+            <button id="powerBtn" onclick="toggle()">SYSTEM OFF</button>
         </div>
     </div>
 
-    <script>
-        // AUDIO PLAYER LOGIC
-        const audio = document.getElementById('myAudio');
-        const playBtn = document.getElementById('playBtn');
-        const volSlider = document.getElementById('volumeSlider');
+<script>
+    const left = document.getElementById('L');
+    const right = document.getElementById('R');
+    const powerBtn = document.getElementById('powerBtn');
+    const warningOverlay = document.getElementById('warning-overlay');
+    
+    let active = false;
+    let step = 0;
+    let loop = null;
 
-        playBtn.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play();
-                playBtn.innerText = "⏸";
-            } else {
-                audio.pause();
-                playBtn.innerText = "▶";
-            }
-        });
+    // Function to dismiss the warning permanently (for this session)
+    function dismissWarning() {
+        warningOverlay.classList.add('hidden');
+        sessionStorage.setItem('warningDismissed', 'true');
+    }
 
-        volSlider.addEventListener('input', (e) => {
-            audio.volume = e.target.value;
-        });
+    // Check immediately if the user has already dismissed the warning
+    window.onload = function() {
+        if (sessionStorage.getItem('warningDismissed') === 'true') {
+            warningOverlay.classList.add('hidden');
+        }
+    }
 
-        // LOADER & ENTRY LOGIC
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loading-screen').style.opacity = '0';
-                document.getElementById('loading-screen').style.visibility = 'hidden';
-                document.getElementById('mainCard').classList.add('visible');
+    function setLight(side, color) {
+        const el = (side === 'L') ? left : right;
+        el.className = 'light-panel ' + (color === 'off' ? 'off' : color + '-glow');
+    }
 
-                setTimeout(() => {
-                    document.getElementById('husksites-notif').classList.add('show');
-                    setTimeout(() => document.getElementById('husksites-notif').classList.remove('show'), 3000);
-                }, 1000);
-            }, 2500);
-        });
+    function run() {
+        if (!active) return;
 
-        // TAB LOGIC
-        function openTab(evt, tabName) {
-            const sections = document.getElementsByClassName("content-section");
-            for (let i = 0; i < sections.length; i++) sections[i].classList.remove("active");
-            const tabs = document.getElementsByClassName("tab-btn");
-            for (let i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
-            
-            document.getElementById(tabName).classList.add("active");
-            if(evt) evt.currentTarget.classList.add("active");
+        const mode = document.getElementById('mode').value;
+        const speed = parseInt(document.getElementById('speed').value);
+
+        switch(mode) {
+            case 'oneforone':
+                if (step % 2 === 0) { setLight('L', 'red'); setLight('R', 'off'); }
+                else { setLight('L', 'off'); setLight('R', 'blue'); }
+                step++;
+                break;
+
+            case 'twofortwo':
+                const patterns = [
+                    ['red', 'off'], ['off', 'off'], ['red', 'off'], ['off', 'off'],
+                    ['off', 'blue'], ['off', 'off'], ['off', 'blue'], ['off', 'off']
+                ];
+                // Note: The logic below needs a minor tweak from the prior version to reference array correctly
+                const currentPattern = patterns[step];
+                setLight('L', currentPattern[0]);
+                setLight('R', currentPattern[1]);
+                step = (step + 1) % 8;
+                break;
+
+            case 'wigwag':
+                if (Math.floor(step/4) % 2 === 0) { setLight('L', 'red'); setLight('R', 'off'); }
+                else { setLight('L', 'off'); setLight('R', 'blue'); }
+                step++;
+                break;
+
+            case 'sync':
+                if (step % 2 === 0) { setLight('L', 'red'); setLight('R', 'blue'); }
+                else { setLight('L', 'off'); setLight('R', 'off'); }
+                step++;
+                break;
         }
 
-        function openTabDirect(tabName) {
-            openTab(null, tabName);
-            const buttons = document.querySelectorAll('.tab-btn');
-            buttons.forEach(btn => {
-                if(btn.innerText.toLowerCase().includes(tabName)) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            toggleMenu();
+        loop = setTimeout(run, speed);
+    }
+
+    function toggle() {
+        // Ensure warning is dismissed before allowing toggle power button use
+        if (!sessionStorage.getItem('warningDismissed') === 'true') {
+             // This line is technically unreachable because the button is behind the overlay initially
+             return; 
         }
 
-        function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
-        function toggleTheme() {
-            const html = document.documentElement;
-            html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+        active = !active;
+        if (active) {
+            powerBtn.innerText = "SYSTEM ACTIVE";
+            powerBtn.classList.add('active');
+            run();
+        } else {
+            powerBtn.innerText = "SYSTEM OFF";
+            powerBtn.classList.remove('active');
+            clearTimeout(loop);
+            setLight('L', 'off');
+            setLight('R', 'off');
+            step = 0;
         }
-    </script>
+    }
+</script>
 </body>
 </html>
