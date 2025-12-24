@@ -31,16 +31,27 @@
         100% { background-position: 0% 50%; }
       }
 
+      /* Updated Loading Screen Styles */
       #loading-screen {
         position: fixed; inset: 0; background: #0b0e14;
         display: flex; flex-direction: column; justify-content: center; align-items: center;
         z-index: 9999; transition: opacity 0.8s ease-out, visibility 0.8s;
       }
 
-      .loader {
+      .loader-circle {
         width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
         border-top-color: var(--accent); border-radius: 50%;
-        animation: spin 1s linear infinite; margin-bottom: 15px;
+        animation: spin 1s linear infinite; margin-bottom: 20px;
+      }
+
+      .loading-title {
+        font-size: 18px; font-weight: 600; margin: 10px 0;
+        letter-spacing: 1px; color: var(--accent);
+      }
+
+      .loading-credits {
+        font-size: 10px; opacity: 0.5; text-transform: uppercase;
+        letter-spacing: 2px; margin-top: 5px;
       }
 
       @keyframes spin { to { transform: rotate(360deg); } }
@@ -99,9 +110,11 @@
   </head>
   <body>
 
+    <!-- Integrated Loading Screen -->
     <div id="loading-screen">
-      <div class="loader"></div>
-      <p id="loading-text">Loading Guidelines...</p>
+        <div class="loader-circle"></div>
+        <p class="loading-title">Loading Experience</p>
+        <div class="loading-credits">Created by Husk &amp; Hosted by HacerHosters</div>
     </div>
 
     <div class="bg-container"></div>
@@ -145,29 +158,30 @@
     <script>
       const DISCORD_LINK = "https://discord.gg/DqcYkUDUzm";
 
-      // 1. Fixed Loading Sequence
       window.onload = () => {
-        const statuses = ["Syncing ToS...", "Checking Compliance...", "Ready"];
+        const statuses = ["Syncing ToS...", "Checking Compliance...", "Launching..."];
         let i = 0;
         const interval = setInterval(() => {
-          const txt = document.getElementById('loading-text');
+          const txt = document.querySelector('.loading-title');
           if(txt) txt.innerText = statuses[i];
           i++;
           if(i >= statuses.length) {
             clearInterval(interval);
             fadeOutLoader();
           }
-        }, 600);
+        }, 700);
       };
 
       function fadeOutLoader() {
         const loader = document.getElementById('loading-screen');
         const main = document.getElementById('main-content');
-        if(loader) loader.style.opacity = '0';
-        setTimeout(() => {
-          if(loader) loader.style.visibility = 'hidden';
-          if(main) main.style.opacity = '1';
-        }, 800);
+        if(loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none'; // Changed to none to prevent clicking issues
+                if(main) main.style.opacity = '1';
+            }, 800);
+        }
       }
 
       function toggleBtn() {
@@ -195,17 +209,14 @@
         btn.innerText = "VERIFYING...";
         btn.disabled = true;
 
-        // Check if running inside Google Apps Script
         if (typeof google !== 'undefined' && google.script && google.script.run) {
           google.script.run
             .withSuccessHandler(showSuccess)
             .withFailureHandler(() => {
-                alert("Server error, but proceeding to link...");
                 showSuccess();
             })
             .recordAgreement(); 
         } else {
-          // Local/Browser testing fallback
           setTimeout(showSuccess, 1000);
         }
       }
